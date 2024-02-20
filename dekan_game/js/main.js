@@ -1,26 +1,25 @@
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-// Выбор карты, монстров и припятствия
-// let choiceMap = prompt("выберите карту:")
-// let choiceMonsters = prompt("выберите монстров:")
-// let choiceObstacles = prompt("выберите припятствия:")
 
-
+// Выбор карты
+const urlParams = new URLSearchParams(window.location.search);
+const choiceMap = urlParams.get('selectedMap');
 const ground = new Image();
-// ground.src = `img/${choiceMap}.jpg`;
-ground.src = "img/map4.jpg";
+ground.src = `img/${choiceMap}.jpg`;
 
+// еда
 const foodImg = new Image();
 foodImg.src = "img/food.png";
 
-
+// монстры
 const monsterImg = new Image();
 monsterImg.src = "img/monster.png";
 
 
 
-
+// размер блока 
 let box = 32;
 
 let score = 0;
@@ -32,6 +31,7 @@ let food = {
 };
 
 
+// генерировать монстров
 let monsters = [];
 function generateMonster() {
 	let newMonster = {
@@ -56,8 +56,8 @@ let winplace = {
 
 document.addEventListener("keydown", direction);
 
-let dir;
 
+let dir;
 function direction(event) {
 	if(event.keyCode == 37 && dir != "right")
 		dir = "left";
@@ -76,6 +76,8 @@ function eatTail(head, arr) {
 	}
 }
 
+
+// Движение монстров
 function moveMonsters() {
 	for(let i = 0; i < monsters.length; i++) {
 	  let randomDirection = Math.floor(Math.random() * 4); // Генерация случайного числа для определения направления
@@ -93,11 +95,43 @@ function moveMonsters() {
   }
 
 moveMonsters()
-setInterval(moveMonsters, 1000);
+movemonstres1 = setInterval(moveMonsters, 1000);
 
 generateMonster();
-setInterval(generateMonster, 300);
+generateMonster1 = setInterval(generateMonster, 300);
 
+
+// Отвечает за паузу
+let paused = false;
+document.addEventListener("keydown", function(event) {
+	if(event.keyCode == 27) {
+	  if(paused) {
+		game = setInterval(drawGame, 100);
+		movemonstres1 = setInterval(moveMonsters, 1000);
+		generateMonster1 = setInterval(generateMonster, 300);
+		paused = false;
+	  } else {
+		clearInterval(movemonstres1);
+		clearInterval(generateMonster1);
+		clearInterval(game);
+		paused = true;
+	  
+	  }
+	}
+  });
+
+
+
+// Настоящее время
+// const currentTimeDisplay = document.getElementById('currentTimeDisplay');  
+// function getCurrentTime() {
+// const now = new Date();
+// return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')};`
+// }
+
+
+
+// Рисует игру
 function drawGame() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистка холста перед перерисовкой
 
@@ -117,10 +151,14 @@ function drawGame() {
 		ctx.fillRect(snake[i].x, snake[i].y, box, box);
 	}
 
+
+
 	ctx.fillStyle = "white";
 	ctx.font = "50px Arial";
 	ctx.fillText(score, box * 2.5, box * 1.7);
 	ctx.fillText("Health: " + health, box * 2.5, box * 3.5);
+	// ctx.fillText(currentTimeDisplay, box * 2.5, box * 1.7);
+
 
 	let snakeX = snake[0].x;
 	let snakeY = snake[0].y;
